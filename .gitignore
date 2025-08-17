@@ -1,0 +1,25 @@
+# Generated test repositories
+hi-there/
+test-*/
+
+# Development examples and prototypes
+auto-date-example.js
+*-example.js
+*.test.js
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*

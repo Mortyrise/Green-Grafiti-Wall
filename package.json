@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "word": "node index.js",
+    "example": "node example.js",
+    "commits": "node -e \"const {generateCommits} = require('./git-commits'); generateCommits(process.argv[2] || 'HELLO', new Date(process.argv[3] || '2024-01-07'), true);\""
   },
   "repository": {
     "type": "git",
