@@ -1,188 +1,148 @@
-# Git Commits Generator for GitHub Contr# Generate commits (dry run)
-const startDate = new Date('2024-01-07'); // Any date (auto-corrected to nearest Sunday)
-const commitCount = generateCommits("HELLO", startDate, true);tion Graph
+# 🎨 GitHub Contribution Graph Word Generator
 
-A Node.js module that generates Git commits based on 5×7 pixel font matrices to create words in your GitHub contribution graph.
+Transform your GitHub contribution graph into pixel art words! This Node.js tool generates carefully timed Git commits to spell out words in your GitHub profile's contribution calendar.
 
-## 📋 Overview
+## ✨ Features
 
-This project consists of three main modules:
-
-- **`font.js`** - Contains 5×7 pixel font definitions for A-Z and space
-- **`index.js`** - Word to matrix converter with validation
-- **`git-commits.js`** - Git commit generator based on word matrices
+- 🔤 **5×7 Pixel Font** - Complete A-Z alphabet support
+- 📅 **Smart Date Handling** - Automatic Sunday alignment and date correction
+- 🎯 **Multiple Intensities** - Light, medium, dark, and random commit patterns
+- 🖥️ **Interactive CLI** - Preview before creation with confirmation prompts
+- ⚡ **Optional Dates** - Use automatic dates or specify your own
+- 🔒 **Safety Features** - Comprehensive warnings and undo documentation
 
 ## 🚀 Quick Start
 
-### Basic Usage
-
+### 1. Clone and Navigate
 ```bash
-# Show a word as pixel matrix
-node index.js HELLO
-
-# Create repository with interactive preview
-node cli.js create HELLO 2024-01-07 ./hello-pattern
-
-# Preview only (no interaction)
-node cli.js dry-run HELLO 2024-01-07
-
-# Get next Sunday date
-node cli.js next-sunday
+git clone https://github.com/Mortyrise/Green-Grafiti-Wall.git
+cd Green-Grafiti-Wall
 ```
 
-### Using as Node.js Module
-
-```javascript
-const { wordToMatrix } = require('./index');
-const { generateCommits } = require('./git-commits');
-
-// Convert word to matrix
-const matrix = wordToMatrix("HELLO");
-console.log(matrix); // 7×29 matrix
-
-// Generate commits (dry run)
-const startDate = new Date('2024-01-07'); // Must be Sunday
-const commitCount = generateCommits("HELLO", startDate, true);
-```
-
-## 📁 File Structure
-
-```
-├── font.js          # Font matrix definitions (A-Z, space)
-├── index.js         # Word to matrix converter
-├── git-commits.js   # Git commit generator
-├── cli.js           # Command-line interface
-├── example.js       # Usage examples
-└── package.json     # Project configuration
-```
-
-## 🔧 API Reference
-
-### `wordToMatrix(word)`
-
-Converts a word to a 7×N binary matrix.
-
-- **Input**: `string` - Word in any case
-- **Output**: `Array<Array<number>>` - 7 rows × N columns matrix
-- **Throws**: Error if word contains undefined characters or exceeds max width
-
-### `generateCommits(word, startDate, dryRun)`
-
-Generates Git commits based on word matrix.
-
-- **word**: `string` - Word to generate commits for
-- **startDate**: `Date` - Starting date (automatically corrected to nearest Sunday)
-- **dryRun**: `boolean` - If true, only shows commands without executing
-- **Returns**: `number` - Number of commits created/would be created
-
-### `validateDateRange(word, startDate)`
-
-Validates if a start date is appropriate for the given word.
-
-- **Returns**: Object with validation result and date information
-
-## 🔧 CLI Commands
-
-### Command Overview
-
+### 2. Configure Git (Required)
 ```bash
-# Interactive creation with preview
-node cli.js create <word> <date> <path>
-
-# Preview only (no execution)
-node cli.js dry-run <word> <date>
-
-# Utility
-node cli.js next-sunday
+# Make sure your Git is configured with your GitHub email
+git config --global user.name "Your Name"
+git config --global user.email "your-github-email@example.com"
 ```
 
-### Commands Explained
-
-#### `create` - Interactive repository creation
+### 3. Create Your First Pattern
 ```bash
-node cli.js create HELLO 2024-01-07 ./hello-pattern
-```
-- ✅ **Shows preview** of all commits first
-- ✅ **Asks for confirmation** before executing
-- ✅ **Creates clean repository** dedicated to the pattern
-- ✅ **Provides next steps** for GitHub upload
-- 🎯 **Ideal for**: GitHub profile showcase
+# Simplest usage - automatic date and path
+node cli.js create HELLO ./hello-pattern
 
-#### `dry-run` - Preview only
+# With specific date and intensity
+node cli.js create HELLO 2024-01-07 ./hello-pattern 3
+
+# Preview only (no repository creation)
+node cli.js dry-run HELLO 2
+```
+
+## 📖 Usage Examples
+
+### Basic Commands
 ```bash
-node cli.js dry-run HELLO 2024-01-07
-```
-- ✅ **Preview commits** without any execution
-- ✅ **Validate** word and date
-- ✅ **No interaction** required
+# Create with automatic date (last Sunday)
+node cli.js create CODE ./my-code-pattern
 
-#### `next-sunday` - Get valid start date
+# Create with specific date (auto-corrects to nearest Sunday)
+node cli.js create GITHUB 2024-06-10 ./github-pattern
+
+# Preview without creating anything
+node cli.js dry-run NODEJS 3
+```
+
+### Intensity Levels
+- **1** - Light green (2-3 commits/day) - Subtle pattern
+- **2** - Medium green (4-7 commits/day) - **Default**, good visibility
+- **3** - Dark green (10-15 commits/day) - Maximum visibility
+- **4** - Random mix (4-19 commits/day) - Natural, varied appearance
+
+### Command Format
 ```bash
-node cli.js next-sunday
-# Output: Next Sunday: 2024-08-18 (Sun Aug 18 2024)
+node cli.js <command> <word> [date] <path> [intensity]
+
+# Examples:
+node cli.js create HELLO ./hello-repo                    # Auto date, medium intensity
+node cli.js create HELLO 2024-01-07 ./hello-repo        # Specific date, medium intensity  
+node cli.js create HELLO ./hello-repo 4                 # Auto date, random intensity
+node cli.js create HELLO 2024-01-07 ./hello-repo 3      # Specific date, dark intensity
 ```
 
-## 📅 Date Handling
+## 📁 Project Structure
 
-- **Auto-correction**: Any date is automatically corrected to the nearest Sunday
-- **Format**: `YYYY-MM-DD` (e.g., `2024-01-08` → corrected to `2024-01-07`)
-- **User-friendly**: No need to calculate Sunday dates manually
-- **Clear feedback**: Shows original date and corrected date when auto-correction occurs
+```
+├── font.js              # 5×7 pixel font definitions (A-Z + space)
+├── index.js             # Word to matrix converter
+├── git-commits.js       # Git commit generator with date handling
+├── cli.js               # Interactive command-line interface
+├── fix-branch.sh/bat    # Branch name correction utilities
+├── UNDO.md              # How to remove/undo contribution patterns
+└── README.md            # This file
+```
 
-## ⚠️ Important Notes
+## ⚠️ Important Warnings
 
-1. **Interactive creation** shows preview and asks for confirmation
-2. **Dates are automatically corrected** to nearest Sunday for proper GitHub graph alignment
-3. **Maximum width is 60 columns** (approximately 8-10 characters depending on letters)
-4. **Commits are empty commits** with specific dates for contribution graph
-5. **Words are automatically converted to uppercase**
-6. **Only creates clean repositories** (no mixing with existing projects)
+### Before You Start
+- **This modifies your public GitHub contribution graph**
+- **Changes appear immediately after pushing to GitHub**
+- **Make sure you understand the implications**
+- **Test with private repositories first if unsure**
 
-## 📊 Practical Example
+### Email Configuration Critical
+Your Git email **must match** an email associated with your GitHub account:
+1. Check your GitHub emails: https://github.com/settings/emails
+2. Configure Git: `git config --global user.email "your-github-email@example.com"`
 
-### Scenario: Create "HELLO" pattern for GitHub profile
+## 🔄 How to Undo
 
+If you want to remove patterns from your contribution graph:
+
+### Method 1: Delete Repository (Easiest)
+1. Go to repository settings on GitHub
+2. Scroll to "Danger Zone" → "Delete this repository"
+3. Confirm deletion
+4. Changes disappear from your graph within 24 hours
+
+### Method 2: Fix Branch Issues
 ```bash
-# Step 1: Create repository (any date works - auto-corrected to Sunday)
-node cli.js create HELLO 2024-01-08 ./hello-contribution
-# → Shows: "📅 Date auto-corrected: Mon Jan 08 2024 → Sun Jan 07 2024"
-# → Shows preview of all commits
-# → Asks: "Do you want to proceed? (y/N):"
-# → Creates repository if confirmed
-
-# Step 2: Push to GitHub
-cd hello-contribution
-git remote add origin https://github.com/yourusername/hello-contribution.git
-git push -u origin main
+# If you have master/main branch issues
+cd your-repository
+./fix-branch.sh    # Linux/Mac
+# or
+fix-branch.bat     # Windows
 ```
 
-### Scenario: Just preview without creating
+See [UNDO.md](UNDO.md) for detailed instructions.
 
-```bash
-# Only see what would be created (no interaction)
-node cli.js dry-run HELLO 2024-01-07
-```
+## 🔧 Technical Details
 
-## 🎯 Workflow
+### How It Works
+1. **Font Conversion** - Converts words to 5×7 binary matrices
+2. **Date Calculation** - Maps matrix to GitHub's week-based calendar
+3. **Commit Generation** - Creates multiple commits per "pixel" for visibility
+4. **Repository Creation** - Builds clean Git repository with proper history
 
-1. **Create with any date**: `node cli.js create WORD ANY_DATE PATH`
-2. **Auto-correction happens**: System finds nearest Sunday automatically
-3. **Review preview** and confirm with 'y'
-4. **Push to GitHub** for profile display
+### Date Handling
+- **Automatic Correction** - Any date gets corrected to nearest Sunday
+- **Week Alignment** - GitHub weeks start on Sunday, tool handles this automatically
+- **Range Calculation** - Shows exactly which dates will be affected
 
-## 📈 Supported Characters
+### Supported Characters
+- **A-Z** - Complete uppercase alphabet
+- **Space** - For word separation
+- **Auto-conversion** - Lowercase letters converted automatically
+- **Maximum width** - ~8-10 characters depending on letters (60 columns total)
 
-- **A-Z**: All uppercase letters
-- **Space**: For word separation
-- **Automatic conversion**: Lowercase letters are converted to uppercase
+## 🎯 Tips for Best Results
 
-## 🚨 Safety Features
-
-- **Dry-run mode**: Preview before execution
-- **Validation**: Comprehensive input validation
-- **Error handling**: Clear error messages
-- **Non-destructive**: Only creates empty commits
+- **Start with short words** (3-5 letters) to test
+- **Use intensity 2 or 3** for good visibility
+- **Check preview carefully** before confirming
+- **Verify your email configuration** before creating patterns
+- **Consider using private repos** for experimentation
+- **Remember patterns span multiple weeks** - plan accordingly
 
 ---
 
-**Created for educational purposes. Use responsibly and in accordance with GitHub's terms of service.**
+**Created for educational purposes. Use responsibly! 🚀**

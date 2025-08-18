@@ -1,25 +1,39 @@
-# Generated test repositories
+# Generated test repositories and patterns
 hi-there/
 test-*/
+*-pattern/
+*-repo/
 
 # Development examples and prototypes
-auto-date-example.js
 *-example.js
+example.js
 *.test.js
+
+# Scripts for fixing old repos (keep but don't track changes)
+fix-email.*
 
 # Temporary files
 *.tmp
 *.temp
+*.log
 
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # IDE files
 .vscode/
+.idea/
 *.swp
 *.swo
+*~
 
-# Logs
-*.log
+# Node.js (if we add dependencies later)
+node_modules/
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Git filter-branch backup
+.git/refs/original/

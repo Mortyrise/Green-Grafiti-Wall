@@ -278,8 +278,8 @@ function createGitRepo(word, startDate, repoPath = '.', dryRun = false, intensit
   const initCommands = [
     `git init ${repoPath}`,
     `cd ${repoPath}`,
-    'git config user.name "GitHub Contribution Bot"',
-    'git config user.email "bot@example.com"',
+    'git config user.name "$(git config --global user.name || echo \'Contribution Generator\')"',
+    'git config user.email "$(git config --global user.email || echo \'Please set your git email\')"',
     'git config init.defaultBranch main',
     'echo "# Contribution Pattern" > README.md',
     'git add README.md',
@@ -295,18 +295,31 @@ function createGitRepo(word, startDate, repoPath = '.', dryRun = false, intensit
     try {
       execSync(`git init ${repoPath}`, { stdio: 'ignore' });
       process.chdir(repoPath);
-      execSync('git config user.name "GitHub Contribution Bot"', { stdio: 'ignore' });
-      execSync('git config user.email "bot@example.com"', { stdio: 'ignore' });
+      
+      // Use global git config or prompt user to set it
+      try {
+        const globalName = execSync('git config --global user.name', { encoding: 'utf8' }).trim();
+        const globalEmail = execSync('git config --global user.email', { encoding: 'utf8' }).trim();
+        
+        if (!globalEmail) {
+          throw new Error('No email configured. Please run: git config --global user.email "your-email@github.com"');
+        }
+        
+        execSync(`git config user.name "${globalName}"`, { stdio: 'ignore' });
+        execSync(`git config user.email "${globalEmail}"`, { stdio: 'ignore' });
+      } catch (configError) {
+        throw new Error('Git user not configured. Please run:\n  git config --global user.name "Your Name"\n  git config --global user.email "your-email@github.com"');
+      }
+      
       execSync('git config init.defaultBranch main', { stdio: 'ignore' });
       
       // Create initial README and commit
-      const fs = require('fs');
       fs.writeFileSync('README.md', `# ${word} Contribution Pattern\n\nGenerated using Git Commits Generator\n`);
       execSync('git add README.md', { stdio: 'ignore' });
       execSync('git commit -m "Initial commit"', { stdio: 'ignore' });
       execSync('git branch -M main', { stdio: 'ignore' });
     } catch (error) {
-      throw new Error('Failed to initialize Git repository');
+      throw new Error(`Failed to initialize Git repository: ${error.message}`);
     }
   }
 
