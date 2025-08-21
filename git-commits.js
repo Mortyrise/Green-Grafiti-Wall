@@ -1,20 +1,7 @@
-/**
- * Git Commit Generator for 7×N Binary Matrix
- * Generates Git commits based on word matrices for GitHub contribution graph
- */
-
 const { execSync } = require('child_process');
 const { wordToMatrix, MAX_COLUMNS } = require('./index');
 const fs = require('fs');
 
-/**
- * Generates Git commits based on a word matrix
- * @param {string} word - Word to convert to commits
- * @param {Date} startDate - Starting date (should be a Sunday)
- * @param {boolean} dryRun - If true, only prints commands without executing
- * @param {number} intensity - Commit intensity: 1=light, 2=medium, 3=dark, 4=random
- * @returns {number} Number of commits that would be/were created
- */
 function generateCommits(word, startDate, dryRun = false, intensity = 2) {
   if (typeof word !== 'string') {
     throw new Error('Word must be a string');
@@ -32,26 +19,24 @@ function generateCommits(word, startDate, dryRun = false, intensity = 2) {
   }
 
   if (startDate.getDay() !== 0) {
-    // Auto-correct to closest Sunday
     const originalDate = new Date(startDate);
     startDate = getClosestSunday(startDate);
     
     if (dryRun) {
-      console.log(`📅 Date auto-corrected: ${originalDate.toDateString()} → ${startDate.toDateString()} (closest Sunday)`);
+      console.log(`Date auto-corrected: ${originalDate.toDateString()} → ${startDate.toDateString()} (closest Sunday)`);
     }
   }
 
-  // Intensity mapping for commit counts
   const getCommitCount = (intensityLevel) => {
     switch (intensityLevel) {
-      case 1: return 2;  // Light green (2-3 commits)
-      case 2: return Math.random() < 0.5 ? 5 : 6;  // Medium green (4-7 commits)
-      case 3: return Math.random() < 0.5 ? 12 : 15; // Dark green (10-15 commits)
-      case 4: // Random mix for natural look
+      case 1: return 2;
+      case 2: return Math.random() < 0.5 ? 5 : 6;
+      case 3: return Math.random() < 0.5 ? 12 : 15;
+      case 4:
         const rand = Math.random();
-        if (rand < 0.3) return Math.floor(Math.random() * 3) + 4;  // 4-6 (medium)
-        if (rand < 0.7) return Math.floor(Math.random() * 4) + 7;  // 7-10 (medium-dark)
-        return Math.floor(Math.random() * 8) + 12; // 12-19 (dark)
+        if (rand < 0.3) return Math.floor(Math.random() * 3) + 4;
+        if (rand < 0.7) return Math.floor(Math.random() * 4) + 7;
+        return Math.floor(Math.random() * 8) + 12;
       default: return 5;
     }
   };
@@ -59,19 +44,18 @@ function generateCommits(word, startDate, dryRun = false, intensity = 2) {
   let commitCount = 0;
   const commands = [];
 
-  // Process each column (week) and row (day)
   for (let col = 0; col < matrix[0].length; col++) {
     for (let row = 0; row < matrix.length; row++) {
       if (matrix[row][col] === 1) {
         const commitDate = new Date(startDate);
-        commitDate.setDate(startDate.getDate() + (col * 7) + row);
+        // Correct the offset: ensure Sunday alignment
+        commitDate.setDate(startDate.getDate() + (col * 7) + row + 1);
         
         const dateStr = commitDate.toISOString().split('T')[0];
         const commitsForThisDay = getCommitCount(intensity);
         
-        // Generate multiple commits for this day
         for (let i = 0; i < commitsForThisDay; i++) {
-          const hours = 9 + Math.floor(Math.random() * 8); // Random hour between 9-16
+          const hours = 9 + Math.floor(Math.random() * 8);
           const minutes = Math.floor(Math.random() * 60);
           const timeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
           
@@ -107,11 +91,6 @@ function generateCommits(word, startDate, dryRun = false, intensity = 2) {
   return commitCount;
 }
 
-/**
- * Gets intensity level name for display
- * @param {number} intensity - Intensity level
- * @returns {string} Human readable intensity name
- */
 function getIntensityName(intensity) {
   switch (intensity) {
     case 1: return 'Light green (2-3 commits/day)';
@@ -122,27 +101,16 @@ function getIntensityName(intensity) {
   }
 }
 
-/**
- * Gets ANSI color code for intensity level
- * @param {number} intensity - Intensity level
- * @returns {string} ANSI color code
- */
 function getIntensityColor(intensity) {
   switch (intensity) {
-    case 1: return '\x1b[42m'; // Light green background
-    case 2: return '\x1b[102m'; // Medium green background  
-    case 3: return '\x1b[32m'; // Dark green background
-    case 4: return '\x1b[96m'; // Cyan for random (to distinguish)
-    default: return '\x1b[102m'; // Default medium green
+    case 1: return '\x1b[42m';
+    case 2: return '\x1b[102m';
+    case 3: return '\x1b[32m';
+    case 4: return '\x1b[96m';
+    default: return '\x1b[102m';
   }
 }
 
-/**
- * Prints a matrix with colors representing commit intensity
- * @param {Array<Array<number>>} matrix - Matrix to print
- * @param {string} word - Original word (for title)
- * @param {number} intensity - Intensity level for coloring
- */
 function printMatrixWithIntensity(matrix, word, intensity = 2) {
   const reset = '\x1b[0m';
   const color = getIntensityColor(intensity);
@@ -166,7 +134,6 @@ function printMatrixWithIntensity(matrix, word, intensity = 2) {
   console.log('─'.repeat(matrix[0].length * 2 + 2));
   console.log(`Dimensions: ${matrix.length} rows × ${matrix[0].length} columns`);
   
-  // Legend
   console.log('\nIntensity Legend:');
   console.log(`${getIntensityColor(1)}██${reset} Light (2-3 commits/day)`);
   console.log(`${getIntensityColor(2)}██${reset} Medium (4-7 commits/day) - Default`);
@@ -174,25 +141,18 @@ function printMatrixWithIntensity(matrix, word, intensity = 2) {
   console.log(`${getIntensityColor(4)}██${reset} Random (4-19 commits/day)`);
 }
 
-/**
- * Validates if a start date is appropriate for the given word
- * @param {string} word - Word to validate
- * @param {Date} startDate - Proposed start date
- * @returns {Object} Validation result with isValid boolean and message
- */
 function validateDateRange(word, startDate) {
   try {
     const matrix = wordToMatrix(word);
-    const totalWidth = matrix[0].length;
+    const totalWeeks = matrix[0].length;
     
-    // Auto-correct to Sunday if needed
     let correctedDate = startDate;
     if (startDate.getDay() !== 0) {
       correctedDate = getClosestSunday(startDate);
     }
 
     const endDate = new Date(correctedDate);
-    endDate.setDate(correctedDate.getDate() + (totalWidth * 7) - 1);
+    endDate.setDate(correctedDate.getDate() + (totalWeeks * 7) - 1);
 
     const message = startDate.getDay() !== 0 
       ? `Date auto-corrected to Sunday: ${correctedDate.toDateString()}`
@@ -201,7 +161,7 @@ function validateDateRange(word, startDate) {
     return {
       isValid: true,
       message: `${message} to ${endDate.toDateString()}`,
-      totalWeeks: totalWidth,
+      totalWeeks: totalWeeks,
       startDate: correctedDate,
       endDate: endDate,
       wasAutocorrected: startDate.getDay() !== 0
@@ -214,42 +174,49 @@ function validateDateRange(word, startDate) {
   }
 }
 
-/**
- * Gets the closest Sunday to a given date (before or on the date)
- * @param {Date} date - Reference date
- * @returns {Date} Closest Sunday (same date if already Sunday, or previous Sunday)
- */
 function getClosestSunday(date) {
   const sunday = new Date(date);
-  const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+  const dayOfWeek = date.getDay();
   
   if (dayOfWeek === 0) {
-    // Already a Sunday
     return sunday;
   }
   
-  // Go back to the previous Sunday
   sunday.setDate(date.getDate() - dayOfWeek);
   return sunday;
 }
 
-/**
- * Gets the default start date (last Sunday)
- * @returns {Date} Last Sunday (or today if today is Sunday)
- */
-function getDefaultStartDate() {
+function getOptimalStartDate(word = "HELLO", year = null) {
   const today = new Date();
-  const daysBack = today.getDay(); // 0=Sunday, 1=Monday, etc.
-  const lastSunday = new Date(today);
-  lastSunday.setDate(today.getDate() - daysBack);
-  return lastSunday;
+  const targetYear = year || today.getFullYear();
+  
+  try {
+    const matrix = wordToMatrix(word);
+    const patternWeeks = matrix[0].length;
+    
+    // Start from beginning of year and calculate center
+    const yearStart = new Date(targetYear, 0, 1);
+    const firstSunday = getNextSunday(yearStart);
+    
+    // Center the pattern in the year (52 weeks total)
+    const weeksInYear = 52;
+    const startOffsetWeeks = Math.floor((weeksInYear - patternWeeks) / 2);
+    
+    const startDate = new Date(firstSunday);
+    startDate.setDate(firstSunday.getDate() + (startOffsetWeeks * 7));
+    
+    return getClosestSunday(startDate);
+    
+  } catch (error) {
+    const fallbackDate = new Date(targetYear, 5, 15);
+    return getClosestSunday(fallbackDate);
+  }
 }
 
-/**
- * Gets the next Sunday from a given date
- * @param {Date} date - Reference date
- * @returns {Date} Next Sunday
- */
+function getDefaultStartDate() {
+  return getOptimalStartDate();
+}
+
 function getNextSunday(date) {
   const nextSunday = new Date(date);
   const daysUntilSunday = 7 - date.getDay();
@@ -257,22 +224,12 @@ function getNextSunday(date) {
   return nextSunday;
 }
 
-/**
- * Creates a complete Git repository with commits for a word
- * @param {string} word - Word to create commits for
- * @param {Date} startDate - Starting date (must be Sunday)
- * @param {string} repoPath - Path where to create the repository
- * @param {boolean} dryRun - If true, only shows what would be done
- * @param {number} intensity - Commit intensity level (1-4)
- * @returns {Object} Result with commit count and repository info
- */
 function createGitRepo(word, startDate, repoPath = '.', dryRun = false, intensity = 2) {
   const validation = validateDateRange(word, startDate);
   if (!validation.isValid) {
     throw new Error(validation.message);
   }
 
-  // Use the auto-corrected date
   const correctedStartDate = validation.startDate || startDate;
 
   const initCommands = [
@@ -296,7 +253,6 @@ function createGitRepo(word, startDate, repoPath = '.', dryRun = false, intensit
       execSync(`git init ${repoPath}`, { stdio: 'ignore' });
       process.chdir(repoPath);
       
-      // Use global git config or prompt user to set it
       try {
         const globalName = execSync('git config --global user.name', { encoding: 'utf8' }).trim();
         const globalEmail = execSync('git config --global user.email', { encoding: 'utf8' }).trim();
@@ -313,7 +269,6 @@ function createGitRepo(word, startDate, repoPath = '.', dryRun = false, intensit
       
       execSync('git config init.defaultBranch main', { stdio: 'ignore' });
       
-      // Create initial README and commit
       fs.writeFileSync('README.md', `# ${word} Contribution Pattern\n\nGenerated using Git Commits Generator\n`);
       execSync('git add README.md', { stdio: 'ignore' });
       execSync('git commit -m "Initial commit"', { stdio: 'ignore' });
@@ -343,6 +298,7 @@ module.exports = {
   getNextSunday,
   getClosestSunday,
   getDefaultStartDate,
+  getOptimalStartDate,
   createGitRepo,
   getIntensityName,
   printMatrixWithIntensity,

@@ -1,9 +1,3 @@
-/**
- * 5×7 Pixel Font Matrix for ASCII letters
- * Each letter is represented as a 7-row × 5-column matrix
- * 1 = active pixel, 0 = empty pixel
- */
-
 const LETTER_WIDTH = 5;
 const LETTER_HEIGHT = 7;
 
